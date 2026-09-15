@@ -1,9 +1,6 @@
 import React,{useRef,useMemo,useEffect,useState} from 'react';
 import {Canvas,useFrame,useThree} from '@react-three/fiber';
-import {OrbitControls} from 'https://esm.sh/@react-three/drei@9.114.3/core/OrbitControls.js?external=react,react-dom,three,@react-three/fiber';
-import {OrthographicCamera} from 'https://esm.sh/@react-three/drei@9.114.3/core/OrthographicCamera.js?external=react,react-dom,three,@react-three/fiber';
-import {PerspectiveCamera} from 'https://esm.sh/@react-three/drei@9.114.3/core/PerspectiveCamera.js?external=react,react-dom,three,@react-three/fiber';
-import {Stars} from 'https://esm.sh/@react-three/drei@9.114.3/core/Stars.js?external=react,react-dom,three,@react-three/fiber';
+import {OrbitControls,OrthographicCamera,PerspectiveCamera,Stars} from '@react-three/drei';
 import * as THREE from 'three';
 import {useScene,demo} from './store.js';
 const h=React.createElement;
