@@ -8,7 +8,25 @@ const h=React.createElement;
 const icon=(Icon,size=18,props={})=>h(Icon,{size,strokeWidth:1.7,...props});
 function Button({children,onClick,className='',...props}){return h('button',{onClick,className:`button ${className}`,...props},children);}
 function IconButton({Icon,title,onClick,active=false,...props}){return h('button',{className:`icon-button ${active?'active':''}`,title,'aria-label':title,onClick,...props},icon(Icon));}
-class ErrorBoundary extends React.Component{constructor(props){super(props);this.state={error:null};}static getDerivedStateFromError(error){return {error};}render(){return this.state.error?h('div',{className:'canvas-error'},icon(AlertCircle,30),h('h3',null,'The 3D renderer couldn’t start'),h('p',null,'Please enable WebGL / hardware acceleration, then reload.'),h(Button,{onClick:()=>location.reload()},'Reload')):this.props.children;}}
+class ErrorBoundary extends React.Component{
+  constructor(props){super(props);this.state={error:null};}
+  static getDerivedStateFromError(error){return {error};}
+  componentDidCatch(error,info){console.error('SceneForge 3D renderer error:',error,info);}
+  render(){
+    if(!this.state.error)return this.props.children;
+    return h('div',{className:'canvas-error'},
+      icon(AlertCircle,30),
+      h('h3',null,'The 3D renderer couldn’t start'),
+      h('p',null,this.state.error?.message?.includes('WebGL')
+        ?'Please enable WebGL / hardware acceleration in your browser settings, then reload.'
+        :'A graphics or browser issue prevented the 3D canvas from initializing.'),
+      h('div',{style:{display:'flex',gap:'8px',marginTop:'12px'}},
+        h(Button,{onClick:()=>this.setState({error:null})},'Retry'),
+        h(Button,{className:'secondary',onClick:()=>location.reload()},'Reload Page')
+      )
+    );
+  }
+}
 function SceneCanvas({preview}){return h(ErrorBoundary,null,h(Suspense,{fallback:h('div',{className:'boot'},icon(LoaderCircle,26,{className:'spin'}),h('p',null,'Preparing your little world…'))},h(Scene,{preview})));}
 function Logo({onClick}){return h('button',{className:'brand',onClick,'aria-label':'SceneForge home'},h('span',{className:'brand-symbol'},icon(Box,23)),h('span',null,'SCENE',h('span',{className:'brand-light'},'FORGE')));}
 function Modal({title,onClose,children,className=''}){const ref=useRef();useEffect(()=>{const before=document.activeElement;ref.current?.focus();const handler=e=>{if(e.key==='Escape')onClose();if(e.key==='Tab'){const items=ref.current.querySelectorAll('button:not(:disabled),textarea,input,select,[tabindex="0"]');const first=items[0],last=items[items.length-1];if(e.shiftKey&&document.activeElement===first){e.preventDefault();last?.focus();}else if(!e.shiftKey&&document.activeElement===last){e.preventDefault();first?.focus();}}};document.addEventListener('keydown',handler);return ()=>{document.removeEventListener('keydown',handler);before?.focus();};},[]);return h('div',{className:'modal-backdrop',onMouseDown:e=>{if(e.target===e.currentTarget)onClose();}},h('section',{className:`modal ${className}`,role:'dialog','aria-modal':true,'aria-label':title,tabIndex:-1,ref},h('div',{className:'modal-top'},h('span',{className:'eyebrow'},title),h(IconButton,{Icon:X,title:'Close',onClick:onClose})),children));}
